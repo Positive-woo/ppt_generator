@@ -38,7 +38,7 @@ def parse_song_form(song_form: str):
     """
     송폼을 리스트 형식으로 바꿔주는 파싱 함수
     """
-    return re.findall(r"\([^)]+\)|[A-Z]", song_form)
+    return re.findall(r"\([^)]+\)|[A-Z][0-9]*", song_form)
 
 
 def add_lyrics_slide(prs, slide_text: str):

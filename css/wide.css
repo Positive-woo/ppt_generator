@@ -1,0 +1,58 @@
+/* 전체 메인 영역 폭 확장 */
+.main .block-container,
+div.block-container {
+    max-width: 100%;
+    padding-left: 2rem;
+    padding-right: 2rem;
+}
+
+/* 카드 래퍼 */
+.song-card-wrapper {
+    position: relative;
+    margin-bottom: 0.6rem;
+}
+
+/* 카드 UI */
+.song-card {
+    padding: 0.8rem 0.9rem;
+    border-radius: 14px;
+    background: rgba(0, 0, 0, 0.04);
+    transition: background 0.15s ease, transform 0.08s ease;
+}
+
+/* hover / active 효과 */
+.song-card-wrapper:hover .song-card {
+    background: rgba(0, 0, 0, 0.08);
+}
+
+.song-card-wrapper:active .song-card {
+    transform: scale(0.985);
+}
+
+/* 제목 / 아티스트 */
+.song-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #111;
+}
+
+.song-artist {
+    font-size: 0.75rem;
+    color: #777;
+    text-align: right;
+    margin-top: 0.3rem;
+}
+
+/* 🔑 버튼을 카드 위로 덮기 */
+.song-card-wrapper + div[data-testid="stButton"] {
+    position: relative;
+    top: -100%;
+}
+
+/* 버튼 완전 투명 + 전체 클릭 영역 */
+.song-card-wrapper + div[data-testid="stButton"] button {
+    opacity: 0;
+    height: 100%;
+    min-height: 72px;
+    padding: 0;
+}
