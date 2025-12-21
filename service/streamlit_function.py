@@ -57,7 +57,7 @@ def export_holiday(song_form: str) -> str:
 
         if token in parts:
             output_lines.append(parts[token].strip())
-            output_lines.append("")  # ← 파트마다 무조건 엔터 한 줄
+            output_lines.append("")
 
     result = "\n".join(output_lines)
     result = re.sub(r"//+", "", result).strip()

@@ -102,7 +102,7 @@ with col_right:
         part_lyrics = st.text_area(
             label=f"가사 {i + 1}",
             height=120,
-            placeholder="한 페이지에 넣을 분량 이후 '//' 구분자",
+            placeholder="가사를 넣어주세요",
             key=f"part_lyrics_{i}_{st.session_state.reset_counter}",
         )
         st.divider()

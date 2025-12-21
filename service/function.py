@@ -75,7 +75,7 @@ def render_part(prs, part_text: str):
     파트 문자열 전체를 받아서
     // 기준으로 슬라이드 생성
     """
-    slides = [s.strip() for s in part_text.split("//") if s.strip()]
+    slides = [s.strip() for s in re.split(r"\n\s*\n|//+", part_text) if s.strip()]
     for slide_text in slides:
         add_lyrics_slide(prs, slide_text)
 
