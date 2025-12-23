@@ -1,6 +1,6 @@
 from datetime import datetime
-from pathlib import Path
 from service.streamlit_function import ppt_save
+from io import BytesIO
 import streamlit as st
 import ast
 
@@ -50,14 +50,19 @@ with col_right:
 
     if st.button("📄 PPT 생성하기", use_container_width=True):
         now = datetime.now().strftime("%Y%m%d_%H%M%S")
+        file_name = f"{now}.pptx"
 
-        # 경로 생성
-        ppt_dir = Path("./PPT")
-        ppt_dir.mkdir(exist_ok=True)
+        ppt_buffer = BytesIO()
 
-        ppt_path = ppt_dir / f"{now}.pptx"
+        # ppt_save 함수가 path 대신 file-like object를 받도록 수정
+        ppt_save(song_list, ppt_buffer)
 
-        # PPT 저장 함수 호출
-        ppt_save(song_list, ppt_path)
+        ppt_buffer.seek(0)
 
-        st.toast(f"PPT 생성 완료: {ppt_path}", icon="📄")
+        st.download_button(
+            label="⬇️ PPT 다운로드",
+            data=ppt_buffer,
+            file_name=file_name,
+            mime="application/vnd.openxmlformats-officedocument.presentationml.presentation",
+            use_container_width=True,
+        )
