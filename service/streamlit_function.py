@@ -3,6 +3,9 @@ from pptx import Presentation
 from bs4 import BeautifulSoup
 from urllib.parse import quote
 
+import matplotlib.pyplot as plt
+import pandas as pd
+import numpy as np
 import re
 import streamlit as st
 import requests
@@ -216,3 +219,25 @@ def listup_lyrics_result(results):
                 st.session_state.song_artist = r["artist"]
                 st.session_state.track_id = r["track_id"]
                 st.rerun()
+
+
+def plot_chroma_histogram(chroma_vec):
+    notes = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
+
+    fig, ax = plt.subplots(figsize=(8, 3))
+    ax.bar(notes, chroma_vec)
+    ax.set_title("Pitch Class Histogram (Chroma)")
+    ax.set_ylabel("Normalized Energy")
+    ax.set_xlabel("Note")
+
+    return fig
+
+
+def build_key_ranking_table(ranked_candidates, top_n=10):
+    rows = []
+    for i, (key, mode, score) in enumerate(ranked_candidates[:top_n], start=1):
+        rows.append(
+            {"Rank": i, "Key": key, "Mode": mode, "Correlation": round(score, 3)}
+        )
+
+    return pd.DataFrame(rows)

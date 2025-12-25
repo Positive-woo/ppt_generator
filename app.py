@@ -14,7 +14,7 @@ st.title("동부교회 청년부 자막 생성기 🙏🏻")
 st.write("대시보드 화면")
 
 st.divider()
-st.caption("build : 20251219")
+st.caption("build : 20251225")
 
 # chmod +x run.command
 # kill $(lsof -t -i :8502)

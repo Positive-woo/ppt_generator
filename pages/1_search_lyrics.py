@@ -9,6 +9,12 @@ from service.streamlit_function import (
 )
 from service.streamlit_function import load_css
 
+st.set_page_config(
+    page_title="가사 검색기",
+    page_icon="🙏🏻",
+    layout="wide",
+)
+
 load_css("css/wide.css")
 
 if "reset_counter" not in st.session_state:

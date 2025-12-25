@@ -1,0 +1,19 @@
+[[pages]]
+path = "app.py"
+name = "🏠 Home"
+icon = "🏠"
+
+[[pages]]
+path = "pages/1_search_lyrics.py"
+name = "🎼 가사 검색"
+icon = "🎼"
+
+[[pages]]
+path = "pages/2_ppt_generator.py"
+name = "💻 수련회용 PPT 생성기"
+icon = "💻"
+
+[[pages]]
+path = "pages/3_youtube_bpm_code.py"
+name = "📊 BPM, Key 찾기"
+icon = "📊"

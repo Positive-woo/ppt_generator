@@ -6,6 +6,8 @@ attrs==25.4.0
     # via
     #   jsonschema
     #   referencing
+audioread==3.1.0
+    # via librosa
 beautifulsoup4==4.14.3
     # via worship-ppt (pyproject.toml)
 blinker==1.9.0
@@ -14,10 +16,20 @@ cachetools==6.2.4
     # via streamlit
 certifi==2025.11.12
     # via requests
+cffi==2.0.0
+    # via soundfile
 charset-normalizer==3.4.4
     # via requests
 click==8.3.1
     # via streamlit
+contourpy==1.3.2
+    # via matplotlib
+cycler==0.12.1
+    # via matplotlib
+decorator==5.2.1
+    # via librosa
+fonttools==4.61.1
+    # via matplotlib
 gitdb==4.0.12
     # via gitpython
 gitpython==3.1.45
@@ -28,41 +40,81 @@ jinja2==3.1.6
     # via
     #   altair
     #   pydeck
+joblib==1.5.3
+    # via
+    #   librosa
+    #   scikit-learn
 jsonschema==4.25.1
     # via altair
 jsonschema-specifications==2025.9.1
     # via jsonschema
+kiwisolver==1.4.9
+    # via matplotlib
+lazy-loader==0.4
+    # via librosa
+librosa==0.11.0
+    # via worship-ppt (pyproject.toml)
+llvmlite==0.46.0
+    # via numba
 lxml==6.0.2
     # via python-pptx
 markupsafe==3.0.3
     # via jinja2
+matplotlib==3.10.8
+    # via worship-ppt (pyproject.toml)
+msgpack==1.1.2
+    # via librosa
 narwhals==2.14.0
     # via altair
+numba==0.63.1
+    # via librosa
 numpy==2.2.6
     # via
+    #   contourpy
+    #   librosa
+    #   matplotlib
+    #   numba
     #   pandas
     #   pydeck
+    #   scikit-learn
+    #   scipy
+    #   soundfile
+    #   soxr
     #   streamlit
 packaging==25.0
     # via
     #   altair
+    #   lazy-loader
+    #   matplotlib
+    #   pooch
     #   streamlit
 pandas==2.3.3
     # via streamlit
 pillow==12.0.0
     # via
+    #   matplotlib
     #   python-pptx
     #   streamlit
+platformdirs==4.5.1
+    # via pooch
+pooch==1.8.2
+    # via librosa
 protobuf==6.33.2
     # via streamlit
 pyarrow==22.0.0
     # via streamlit
+pycparser==2.23
+    # via cffi
 pydeck==0.9.1
     # via streamlit
+pyparsing==3.3.1
+    # via matplotlib
 pyperclip==1.11.0
     # via worship-ppt (pyproject.toml)
 python-dateutil==2.9.0.post0
-    # via pandas
+    # via
+    #   matplotlib
+    #   pandas
 python-pptx==1.0.2
     # via worship-ppt (pyproject.toml)
 pytz==2025.2
@@ -72,21 +124,41 @@ referencing==0.37.0
     #   jsonschema
     #   jsonschema-specifications
 requests==2.32.5
-    # via streamlit
+    # via
+    #   pooch
+    #   streamlit
 rpds-py==0.30.0
     # via
     #   jsonschema
     #   referencing
+scikit-learn==1.7.2
+    # via librosa
+scipy==1.15.3
+    # via
+    #   librosa
+    #   scikit-learn
 six==1.17.0
     # via python-dateutil
 smmap==5.0.2
     # via gitdb
+soundfile==0.13.1
+    # via
+    #   worship-ppt (pyproject.toml)
+    #   librosa
 soupsieve==2.8.1
     # via beautifulsoup4
-streamlit==1.52.2
+soxr==1.0.0
+    # via librosa
+st-pages==1.0.1
     # via worship-ppt (pyproject.toml)
+streamlit==1.52.2
+    # via
+    #   worship-ppt (pyproject.toml)
+    #   st-pages
 tenacity==9.1.2
     # via streamlit
+threadpoolctl==3.6.0
+    # via scikit-learn
 toml==0.10.2
     # via streamlit
 tornado==6.5.4
@@ -95,6 +167,7 @@ typing-extensions==4.15.0
     # via
     #   altair
     #   beautifulsoup4
+    #   librosa
     #   python-pptx
     #   referencing
     #   streamlit
@@ -104,3 +177,5 @@ urllib3==2.6.2
     # via requests
 xlsxwriter==3.2.9
     # via python-pptx
+yt-dlp==2025.12.8
+    # via worship-ppt (pyproject.toml)
