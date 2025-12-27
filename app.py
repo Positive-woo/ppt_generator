@@ -1,5 +1,9 @@
 from service.streamlit_function import load_css
 import streamlit as st
+from PIL import Image, ImageOps
+
+img = Image.open("source/dashboard.jpeg")
+img = ImageOps.exif_transpose(img)
 
 load_css("css/wide.css")
 
@@ -11,10 +15,11 @@ st.set_page_config(
 
 
 st.title("동부교회 청년부 자막 생성기 🙏🏻")
-st.write("대시보드 화면")
+st.write("")
+st.image(img, width=600)
 
 st.divider()
-st.caption("build : 20251225")
+st.caption("build : 20251227")
 
 # chmod +x run.command
 # kill $(lsof -t -i :8502)

@@ -4,6 +4,12 @@ from io import BytesIO
 import streamlit as st
 import ast
 
+st.set_page_config(
+    page_title="수련회용 PPT 생성기",
+    page_icon="🙏🏻",
+    layout="wide",
+)
+
 st.title("💬 PPT 생성기")
 
 # ----------------------

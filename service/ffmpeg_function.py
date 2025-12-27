@@ -35,12 +35,18 @@ def download_wav_to_memory(url: str) -> BytesIO:
 
     ffmpeg = [
         "ffmpeg",
+        "-loglevel",
+        "error",
         "-i",
         "pipe:0",
         "-t",
         "30",
+        "-ac",
+        "1",  # mono
+        "-ar",
+        "16000",  # downsample
         "-f",
-        "mp3",
+        "wav",
         "pipe:1",
     ]
 

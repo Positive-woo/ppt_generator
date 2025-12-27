@@ -15,7 +15,16 @@ st.set_page_config(
     page_icon="🙏🏻",
     layout="wide",
 )
-st.title("🎵 YouTube Audio Analyzer")
+st.title("🎵 YouTube Audio 분석기")
+
+
+import time
+
+
+def log_time(msg, t0):
+    now = time.time()
+    print(f"[TIME] {msg}: {now - t0:.3f}s")
+    return now
 
 
 left, right = st.columns([1.2, 1])
@@ -42,12 +51,20 @@ with right:
         if not url:
             st.warning("YouTube URL을 입력하세요.")
         else:
+            t = time.time()
+            print("[TIME] start")
+
             with st.spinner("오디오 다운로드 및 분석 중..."):
                 audio_buf = download_wav_to_memory(url)
+                t = log_time("download_wav_to_memory", t)
 
                 bpm = get_bpm_from_buffer(audio_buf)
-                result = get_key_from_buffer(audio_buf)
+                t = log_time("get_bpm_from_buffer", t)
 
+                result = get_key_from_buffer(audio_buf)
+                t = log_time("get_key_from_buffer", t)
+
+            print(f"[TIME] totla : {time.time() - t:.3f}s")
             st.success("분석 완료")
 
             # ------------------
