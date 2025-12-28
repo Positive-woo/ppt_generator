@@ -1,7 +1,10 @@
 from io import BytesIO
-import matplotlib.pyplot as plt
+from pathlib import Path
+import tempfile
+import subprocess
 import subprocess
 import librosa
+import os
 import numpy as np
 
 MAJOR_PROFILE = np.array(
@@ -67,7 +70,51 @@ def download_wav_to_memory(url: str) -> BytesIO:
     return BytesIO(audio_bytes)
 
 
-def get_bpm_from_buffer(buf) -> int:
+def download_wav_to_tempfile(url: str) -> Path:
+    with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tmp:
+        tmp_path = Path(tmp.name)
+
+    subprocess.run(
+        [
+            "yt-dlp",
+            "--no-playlist",
+            "--playlist-items",
+            "1",
+            "-f",
+            "bestaudio[abr<=192]/bestaudio",
+            "-x",
+            "--audio-format",
+            "wav",
+            "--postprocessor-args",
+            "-t 180 -ac 1 -ar 22050",
+            "--force-overwrites",
+            "-o",
+            str(tmp_path),
+            url,
+        ],
+        check=True,
+    )
+
+    return tmp_path
+
+
+def get_bpm_from_wav(wav_path: str) -> int:
+    y, sr = librosa.load(wav_path, sr=None, mono=True)
+
+    tempo, _ = librosa.beat.beat_track(y=y, sr=sr)
+    tempo = float(np.asarray(tempo).squeeze())
+
+    return int(round(tempo))
+
+
+def get_key_from_wav(wav_path: str):
+    y, sr = librosa.load(wav_path, sr=None, mono=True)
+
+    result = key_find_algorithm(y, sr)
+    return result
+
+
+def get_bpm_from_buffer(buf: BytesIO) -> int:
     buf.seek(0)
     y, sr = librosa.load(buf, sr=None)
 

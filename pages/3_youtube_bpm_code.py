@@ -6,8 +6,11 @@ from service.streamlit_function import plot_chroma_histogram, build_key_ranking_
 from service.ffmpeg_function import (
     extract_video_id,
     download_wav_to_memory,
+    download_wav_to_tempfile,
     get_bpm_from_buffer,
+    get_bpm_from_wav,
     get_key_from_buffer,
+    get_key_from_wav,
 )
 
 st.set_page_config(
@@ -55,13 +58,13 @@ with right:
             print("[TIME] start")
 
             with st.spinner("오디오 다운로드 및 분석 중..."):
-                audio_buf = download_wav_to_memory(url)
+                audio_buf = download_wav_to_tempfile(url)
                 t = log_time("download_wav_to_memory", t)
 
-                bpm = get_bpm_from_buffer(audio_buf)
+                bpm = get_bpm_from_wav(audio_buf)
                 t = log_time("get_bpm_from_buffer", t)
 
-                result = get_key_from_buffer(audio_buf)
+                result = get_key_from_wav(audio_buf)
                 t = log_time("get_key_from_buffer", t)
 
             print(f"[TIME] totla : {time.time() - t:.3f}s")
