@@ -9,7 +9,6 @@ import numpy as np
 import re
 import streamlit as st
 import requests
-import pyperclip
 
 
 def load_css(path: str):
@@ -70,7 +69,7 @@ def export_holiday(song_form: str) -> str:
 {result}
 """
 
-    pyperclip.copy(formatted)
+    # pyperclip.copy(formatted)
 
     st.session_state.extracted_text = formatted
     st.toast("복사되었습니다 ✅", icon="📋")
@@ -97,7 +96,7 @@ def export_retreat(song_form: str):
 }},
 """
 
-    pyperclip.copy(formatted)
+    # pyperclip.copy(formatted)
     st.session_state.extracted_text = formatted
     st.toast("복사되었습니다 ✅", icon="📋")
 
