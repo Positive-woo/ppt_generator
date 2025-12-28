@@ -19,7 +19,7 @@ st.write("")
 st.image(img, width=600)
 
 st.divider()
-st.caption("build : 20251227")
+st.caption("build : 20251228")
 
 # chmod +x run.command
 # kill $(lsof -t -i :8502)
