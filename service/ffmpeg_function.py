@@ -42,8 +42,8 @@ def download_wav_to_memory(url: str) -> BytesIO:
         "error",
         "-i",
         "pipe:0",
-        "-t",
-        "30",
+        # "-t",
+        # "30",
         "-ac",
         "1",  # mono
         "-ar",
@@ -86,7 +86,7 @@ def download_wav_to_tempfile(url: str) -> Path:
             "--audio-format",
             "wav",
             "--postprocessor-args",
-            "-t 180 -ac 1 -ar 22050",
+            "-t 240 -ac 1 -ar 22050",
             "--force-overwrites",
             "-o",
             str(tmp_path),
@@ -94,7 +94,7 @@ def download_wav_to_tempfile(url: str) -> Path:
         ],
         check=True,
     )
-
+    print(tmp_path)
     return tmp_path
 
 
@@ -227,18 +227,22 @@ def build_ranked_results(
 
 
 def key_find_algorithm(y: np.ndarray, sr: int, segment_seconds: float = 10.0):
+    # 전처리
     y = preprocess_audio(y, sr)
 
+    # 음별로 에너지 값 구하는 과정
     chroma_vec = compute_chroma_vector(y, sr, segment_seconds=segment_seconds)
 
+    # 장조, 단조 별로 상관계수 구하기
     major_scores, minor_scores = compute_ks_correlations(chroma_vec)
 
+    # 결과 값 내기
     primary = select_key(major_scores, minor_scores)
     ranked = build_ranked_results(major_scores, minor_scores)
 
     return {
-        "primary_key": primary,  # key, mode, score
-        "ranked_candidates": ranked,  # top-N with scores
+        "primary_key": primary,
+        "ranked_candidates": ranked,  # 후보
         "major_scores": major_scores,
         "minor_scores": minor_scores,
         "chroma_vector": chroma_vec,

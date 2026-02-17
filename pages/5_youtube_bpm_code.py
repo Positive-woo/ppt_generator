@@ -5,11 +5,8 @@ from io import BytesIO
 from service.streamlit_function import plot_chroma_histogram, build_key_ranking_table
 from service.ffmpeg_function import (
     extract_video_id,
-    download_wav_to_memory,
     download_wav_to_tempfile,
-    get_bpm_from_buffer,
     get_bpm_from_wav,
-    get_key_from_buffer,
     get_key_from_wav,
 )
 
@@ -18,7 +15,7 @@ st.set_page_config(
     page_icon="🙏🏻",
     layout="wide",
 )
-st.title("🎵 YouTube Audio 분석기")
+st.title("🎵 YouTube Audio 분석기 // 웹페이지에서는 사용불가 ㅜㅜ")
 
 
 import time

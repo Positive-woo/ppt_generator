@@ -72,7 +72,7 @@ def export_holiday(song_form: str) -> str:
     # pyperclip.copy(formatted)
 
     st.session_state.extracted_text = formatted
-    st.toast("복사되었습니다 ✅", icon="📋")
+    st.toast("생성 완료 ✅", icon="📋")
 
 
 def export_retreat(song_form: str):
@@ -98,7 +98,7 @@ def export_retreat(song_form: str):
 
     # pyperclip.copy(formatted)
     st.session_state.extracted_text = formatted
-    st.toast("복사되었습니다 ✅", icon="📋")
+    st.toast("생성 완료 ✅", icon="📋")
 
 
 def indent_text(text: str, spaces: int = 8) -> str:
