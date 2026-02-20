@@ -6,8 +6,12 @@ readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
     "beautifulsoup4>=4.14.3",
+    "dotenv>=0.9.9",
     "librosa>=0.11.0",
     "matplotlib>=3.10.8",
+    "openai>=2.21.0",
+    "pdf2image>=1.17.0",
+    "pillow>=12.0.0",
     "pyperclip>=1.11.0",
     "python-pptx>=1.0.2",
     "soundfile>=0.13.1",

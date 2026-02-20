@@ -1,6 +1,9 @@
 from service.streamlit_function import load_css
 import streamlit as st
 from PIL import Image, ImageOps
+from dotenv import load_dotenv
+
+load_dotenv()
 
 img = Image.open("source/dashboard.jpeg")
 img = ImageOps.exif_transpose(img)
