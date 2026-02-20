@@ -3,6 +3,7 @@ import base64
 from pdf2image import convert_from_bytes
 from PIL import Image
 import io
+import html
 
 
 def upload_button():
@@ -89,6 +90,12 @@ def load_song_grid_css():
         border-radius: 10px;
         padding: 12px;
         background-color: #fafafa;
+        transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .song-box-selected {
+        border: 2px solid #1f77b4;
+        box-shadow: 0 0 0 2px rgba(31, 119, 180, 0.12);
     }
 
     .song-title {
@@ -130,27 +137,64 @@ def load_song_grid_css():
 
 
 def render_song_boxes(result: dict):
-    song_cols = max(1, min(5, len(result)))
-    html = f'<div class="song-grid" style="--song-cols:{song_cols};">'
+    if not result:
+        st.info("표시할 곡이 없습니다.")
+        return None
 
-    for song_key in result:
-        song = result[song_key][0]
+    songs = list(result.items())
+    song_cols = max(1, min(5, len(songs)))
 
-        html += '<div class="song-box">'
-        html += f'<div class="song-title">{song.get("song_name","")}</div>'
-        html += f'<div class="song-form">{song.get("song_form","")}</div>'
+    selected_key = st.session_state.get("selected_song_key")
+    if selected_key not in result:
+        selected_key = songs[0][0]
+        st.session_state["selected_song_key"] = selected_key
 
-        for k, v in song.items():
-            if k not in ["song_name", "song_form"]:
-                html += (
-                    '<div class="section-row">'
-                    f'<span class="section-label">{k} :</span>'
-                    f'<span class="section-content">{v}</span>'
-                    "</div>"
-                )
+    for row_start in range(0, len(songs), song_cols):
+        row_items = songs[row_start : row_start + song_cols]
+        cols = st.columns(song_cols)
 
-        html += "</div>"
+        for col_index, col in enumerate(cols):
+            with col:
+                if col_index >= len(row_items):
+                    st.empty()
+                    continue
 
-    html += "</div>"
+                song_key, song_list = row_items[col_index]
+                song = song_list[0] if song_list else {}
+                is_selected = song_key == selected_key
+                card_class = "song-box song-box-selected" if is_selected else "song-box"
 
-    st.markdown(html, unsafe_allow_html=True)
+                card_html = f'<div class="{card_class}">'
+                card_html += f'<div class="song-title">{html.escape(str(song.get("song_name", "")))}</div>'
+                card_html += f'<div class="song-form">{html.escape(str(song.get("song_form", "")))}</div>'
+
+                for k, v in song.items():
+                    if k not in ["song_name", "song_form"]:
+                        card_html += (
+                            '<div class="section-row">'
+                            f'<span class="section-label">{html.escape(str(k))} :</span>'
+                            f'<span class="section-content">{html.escape(str(v))}</span>'
+                            "</div>"
+                        )
+
+                card_html += "</div>"
+                st.markdown(card_html, unsafe_allow_html=True)
+
+                button_label = "선택됨" if is_selected else "선택"
+                button_type = "primary" if is_selected else "secondary"
+                if st.button(
+                    button_label,
+                    key=f"select_song_box_{song_key}",
+                    type=button_type,
+                    use_container_width=True,
+                ):
+                    st.session_state["selected_song_key"] = song_key
+                    st.session_state["selected_song_data"] = song
+                    st.rerun()
+
+    selected_key = st.session_state.get("selected_song_key")
+    if selected_key in result and result[selected_key]:
+        st.session_state["selected_song_data"] = result[selected_key][0]
+        return result[selected_key][0]
+
+    return None

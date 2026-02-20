@@ -17,6 +17,7 @@ st.title("📂 악보 자동 곡 분리기")
 uploaded_files = upload_button()  # list
 
 if uploaded_files:
+    st.write("이미지 파싱")
     st.write(f"총 이미지 수 : {len(uploaded_files)}")
     st.write(uploaded_files)
 
@@ -24,8 +25,13 @@ test = '{"song_1":[{"song_name":"밝은 빛이 가득해","song_form":"(8)AAB(8)
 
 if st.button("전송"):
     result = ask_openai_json(uploaded_files)
-    st.write(result)
-    render_song_boxes(result)
+    st.session_state.auto_maker_result = result
 
 if st.button("test"):
-    render_song_boxes(json.loads(test))
+    st.session_state.auto_maker_result = json.loads(test)
+
+if "auto_maker_result" in st.session_state:
+    st.write(st.session_state.auto_maker_result)
+    selected_song = render_song_boxes(st.session_state.auto_maker_result)
+    if selected_song:
+        st.session_state.auto_maker_selected_song = selected_song
