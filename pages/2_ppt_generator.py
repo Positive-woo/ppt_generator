@@ -6,25 +6,40 @@ import streamlit as st
 import ast
 
 SUMMER_TEMPLATE_PATH = Path("source/ppt_template/template.pptx")
+PPT_MIME = "application/vnd.openxmlformats-officedocument.presentationml.presentation"
 
 
-def create_ppt_download(song_list, file_name, template=None, key="ppt_download"):
-    if not song_list:
-        st.warning("먼저 PPT로 만들 곡 정보를 입력해주세요.")
-        return
-
+def build_ppt_bytes(song_list, template=None):
     ppt_buffer = BytesIO()
     ppt_save(song_list, ppt_buffer, template=template)
     ppt_buffer.seek(0)
 
-    st.download_button(
-        label="⬇️ PPT 다운로드",
-        data=ppt_buffer,
-        file_name=file_name,
-        mime="application/vnd.openxmlformats-officedocument.presentationml.presentation",
-        use_container_width=True,
-        key=key,
-    )
+    return ppt_buffer.getvalue()
+
+
+def generate_ppt_files(song_list):
+    if not song_list:
+        st.warning("먼저 PPT로 만들 곡 정보를 입력해주세요.")
+        return False
+
+    now = datetime.now().strftime("%Y%m%d_%H%M%S")
+    generated_ppts = {
+        "default": {
+            "data": build_ppt_bytes(song_list),
+            "file_name": f"{now}.pptx",
+        }
+    }
+
+    if SUMMER_TEMPLATE_PATH.exists():
+        generated_ppts["summer"] = {
+            "data": build_ppt_bytes(song_list, template=SUMMER_TEMPLATE_PATH),
+            "file_name": f"26_하계_{now}.pptx",
+        }
+    else:
+        st.warning(f"하계 템플릿 파일을 찾을 수 없습니다: {SUMMER_TEMPLATE_PATH}")
+
+    st.session_state.generated_ppts = generated_ppts
+    return True
 
 
 st.set_page_config(
@@ -82,27 +97,35 @@ with col_right:
     st.markdown("<br>", unsafe_allow_html=True)
 
     if st.button("📄 PPT 생성하기", use_container_width=True):
-        now = datetime.now().strftime("%Y%m%d_%H%M%S")
-        file_name = f"{now}.pptx"
-
         try:
-            create_ppt_download(song_list, file_name, key="default_ppt_download")
+            if generate_ppt_files(song_list):
+                st.success("PPT 생성이 완료되었습니다. 아래 저장 버튼을 선택해주세요.")
         except Exception as e:
             st.error(f"PPT 생성 실패: {e}")
 
-    if st.button("26_하계_PPT_생성하기", use_container_width=True):
-        if not SUMMER_TEMPLATE_PATH.exists():
-            st.warning(f"템플릿 파일을 찾을 수 없습니다: {SUMMER_TEMPLATE_PATH}")
-        else:
-            now = datetime.now().strftime("%Y%m%d_%H%M%S")
-            file_name = f"26_하계_{now}.pptx"
+    generated_ppts = st.session_state.get("generated_ppts")
 
-            try:
-                create_ppt_download(
-                    song_list,
-                    file_name,
-                    template=SUMMER_TEMPLATE_PATH,
-                    key="summer_2026_ppt_download",
-                )
-            except Exception as e:
-                st.error(f"26_하계 PPT 생성 실패: {e}")
+    if generated_ppts:
+        st.markdown("### PPT 저장하기")
+
+        default_ppt = generated_ppts["default"]
+        st.download_button(
+            label="💾 기본 PPT 저장하기",
+            data=default_ppt["data"],
+            file_name=default_ppt["file_name"],
+            mime=PPT_MIME,
+            use_container_width=True,
+            key="default_ppt_save_download",
+        )
+
+        summer_ppt = generated_ppts.get("summer")
+
+        if summer_ppt:
+            st.download_button(
+                label="💾 26_하계 PPT 저장하기",
+                data=summer_ppt["data"],
+                file_name=summer_ppt["file_name"],
+                mime=PPT_MIME,
+                use_container_width=True,
+                key="summer_2026_ppt_save_download",
+            )
