@@ -55,7 +55,7 @@ Rules:
 - Do NOT keep apostrophes in section labels.
 - Do NOT create section keys for parentheses values like (8).
 - For each unique section label, create a key with the same name.
-- The value must be the first ~20 characters of the lyrics that START within that labeled section.
+- The value must be the first ~25 characters of the lyrics that START within that labeled section.
 - Do NOT include lyrics from the previous section, even if they visually overlap.
 - If a section boundary cuts through a lyric line, use only the portion that belongs to the labeled section and continue forward.
 - Never reference or copy lyrics that appear before the section label.
@@ -77,6 +77,68 @@ Rules:
 
     content = response.choices[0].message.content
 
+    try:
+        return json.loads(content)
+    except Exception:
+        return {"error": "Invalid JSON response", "raw": content}
+
+
+def request_openai_autofill(selected_song: dict, full_lyrics: str) -> dict:
+    """
+    selected_song: auto_maker에서 선택된 곡 정보 전체(JSON dict)
+    full_lyrics: 원곡 전체 가사 문자열
+    """
+    selected_song_text = json.dumps(selected_song, ensure_ascii=False, indent=2)
+
+    response = client.chat.completions.create(
+        model="gpt-5-mini",
+        messages=[
+            {
+                "role": "system",
+                "content": """
+You are a Korean worship-song section mapping assistant.
+
+Return JSON only.
+No markdown, no code fences, no explanation text.
+
+Task:
+1) Use the full original lyrics as the source of truth.
+2) Use selected_song JSON as the section-start hints from score parsing.
+3) Build section lyrics for each part key appearing in selected_song.
+4) Keep song_form exactly as given in selected_song.
+
+Rules:
+- Do not invent new part names.
+- Ignore metadata keys when building parts: song_name, song_form.
+- For each part key, map the correct lyric block from full_lyrics.
+- Keep Korean spacing natural.
+- Format each part lyric with readability line breaks:
+  * Insert one empty line after every 2 non-empty lines.
+  * Output shape should look like "2 lines + blank line + 2 lines + blank line ...".
+- If a part cannot be confidently mapped, return empty string for that part.
+
+Output schema:
+{
+  "song_name": string,
+  "song_form": string,
+  "<PART_KEY>": string
+}
+""",
+            },
+            {
+                "role": "user",
+                "content": f"""selected_song JSON:
+{selected_song_text}
+
+full_lyrics:
+{full_lyrics}
+""",
+            },
+        ],
+        response_format={"type": "json_object"},
+    )
+
+    content = response.choices[0].message.content
     try:
         return json.loads(content)
     except Exception:

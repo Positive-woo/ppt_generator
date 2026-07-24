@@ -240,3 +240,69 @@ def build_key_ranking_table(ranked_candidates, top_n=10):
         )
 
     return pd.DataFrame(rows)
+
+
+def collect_auto_maker_parts() -> dict[str, str]:
+    parts: dict[str, str] = {}
+    reset_counter = st.session_state.get("auto_maker_reset_counter", 0)
+    part_count = st.session_state.get("auto_maker_part_count", 0)
+
+    for i in range(part_count):
+        name = st.session_state.get(
+            f"auto_maker_part_name_{i}_{reset_counter}", ""
+        ).strip()
+        lyrics = st.session_state.get(
+            f"auto_maker_part_lyrics_{i}_{reset_counter}", ""
+        ).strip()
+        if name and lyrics:
+            parts[name] = lyrics
+    return parts
+
+
+def build_sunday_text(song_form: str, parts: dict[str, str], title: str = "") -> str:
+    tokens = parse_song_form(song_form)
+    output_lines: list[str] = []
+
+    for token in tokens:
+        if token.startswith("(") and token.endswith(")"):
+            continue
+        text = parts.get(token, "").strip()
+        if text:
+            output_lines.append(text)
+            output_lines.append("")
+
+    result = "\n".join(output_lines)
+    result = re.sub(r"//+", "", result).strip()
+    if title:
+        return f"{title}\n\n{result}".strip()
+    return result
+
+
+def handle_generate_action(
+    generate_clicked: bool,
+    request_openai_autofill,
+) -> None:
+    if not generate_clicked:
+        return
+
+    selected_song = st.session_state.get("auto_maker_selected_song")
+    full_lyrics = st.session_state.get("auto_maker_lyrics_text", "").strip()
+
+    if not selected_song:
+        st.toast("먼저 상단 곡 박스에서 곡을 선택해주세요.", icon="⚠️")
+        return
+    if not full_lyrics:
+        st.toast("가사 내용이 비어 있습니다.", icon="⚠️")
+        return
+
+    with st.spinner("가사를 파트별로 자동 생성중..."):
+        result = request_openai_autofill(selected_song, full_lyrics)
+
+    st.session_state.auto_maker_autofill_result = result
+    if "error" in result:
+        st.toast(f"자동생성 실패: {result.get('error')}", icon="❌")
+        return
+
+    st.toast("자동생성 완료", icon="✅")
+    st.session_state.auto_maker_autofill_apply = result
+    st.rerun()

@@ -4,6 +4,7 @@ from pdf2image import convert_from_bytes
 from PIL import Image
 import io
 import html
+from typing import Callable
 
 
 def upload_button():
@@ -40,36 +41,6 @@ def upload_button():
             images_base64.append(img_base64)
 
     return images_base64
-
-
-# def render_song_boxes(result: dict):
-#     songs = list(result.keys())
-#     max_per_row = 5
-
-#     for i in range(0, len(songs), max_per_row):
-
-#         cols = st.columns(max_per_row)
-
-#         for col_index in range(max_per_row):
-
-#             song_index = i + col_index
-
-#             if song_index >= len(songs):
-#                 break
-
-#             song_key = songs[song_index]
-#             song_data = result[song_key][0]
-
-#             with cols[col_index]:
-#                 with st.container(border=True):
-
-#                     st.subheader(song_data.get("song_name", "Unknown"))
-
-#                     st.caption(song_data.get("song_form", ""))
-
-#                     for k, v in song_data.items():
-#                         if k not in ["song_name", "song_form"]:
-#                             st.write(f"**{k}** : {v}")
 
 
 def load_song_grid_css():
@@ -198,3 +169,174 @@ def render_song_boxes(result: dict):
         return result[selected_key][0]
 
     return None
+
+
+def render_lyrics_tool_title() -> None:
+    st.subheader("🎶 자동 생성기")
+
+
+def render_lyrics_search_panel(
+    crawl_lyrics: Callable[[str], list],
+    crawl_track_lyrics: Callable[[str], str],
+) -> None:
+    current_track_id = st.session_state.get("auto_maker_track_id")
+    prev_track_id = st.session_state.get("auto_maker_prev_track_id")
+    if current_track_id and current_track_id != prev_track_id:
+        try:
+            st.session_state.auto_maker_lyrics_text = crawl_track_lyrics(
+                current_track_id
+            )
+            st.session_state.auto_maker_prev_track_id = current_track_id
+        except Exception as e:
+            st.toast(f"가사 불러오기 실패: {e}", icon="❌")
+
+    st.subheader("곡 목록")
+
+    with st.form(key="auto_maker_search_form"):
+        query = st.text_input(
+            label="",
+            placeholder="곡명 또는 가수 검색",
+            key="auto_maker_search_query",
+        )
+        submitted = st.form_submit_button("🔎 검색", use_container_width=True)
+    auto_search = st.session_state.pop("auto_maker_trigger_search", False)
+
+    if submitted or auto_search:
+        if not query.strip():
+            st.toast("검색어를 입력하세요.", icon="⚠️")
+        else:
+            try:
+                results = crawl_lyrics(query)
+                st.session_state.auto_maker_search_results = results
+                st.toast("검색 완료", icon="✅")
+            except Exception as e:
+                st.toast(f"검색 실패: {e}", icon="❌")
+
+    st.divider()
+    results = st.session_state.get("auto_maker_search_results", [])
+    if not results:
+        st.info("검색 결과가 여기에 표시됩니다. (상위 8개만 표시)")
+        return
+
+    for idx, r in enumerate(results):
+        title = html.escape(str(r.get("title", "")))
+        artist = html.escape(str(r.get("artist", "")))
+        st.markdown(
+            f"""
+            <div class="song-card-wrapper">
+                <div class="song-card">
+                    <div class="song-title">{title}</div>
+                    <div class="song-artist">{artist}</div>
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+        if st.button(
+            "select",
+            key=f"auto_maker_search_select_{idx}",
+            use_container_width=True,
+        ):
+            st.session_state.auto_maker_song_title = r.get("title", "")
+            st.session_state.auto_maker_song_artist = r.get("artist", "")
+            track_id = r.get("track_id", "")
+            st.session_state.auto_maker_track_id = track_id
+            if track_id:
+                try:
+                    st.session_state.auto_maker_lyrics_text = crawl_track_lyrics(
+                        track_id
+                    )
+                    st.session_state.auto_maker_prev_track_id = track_id
+                except Exception as e:
+                    st.toast(f"가사 불러오기 실패: {e}", icon="❌")
+            st.rerun()
+
+
+def render_lyrics_editor_header() -> bool:
+    header_col, button_col = st.columns([3, 2], gap="small")
+    with header_col:
+        st.subheader("가사")
+    with button_col:
+        generate_clicked = st.button(
+            "자동생성",
+            key="auto_maker_generate_btn",
+            use_container_width=True,
+        )
+    return generate_clicked
+
+
+def render_lyrics_editor_text_area() -> None:
+    st.text_area(
+        label="",
+        height=700,
+        placeholder="검색 후 선택하면 가사가 표시됩니다.",
+        key="auto_maker_lyrics_text",
+    )
+
+
+def render_song_form_editor_panel(
+    part_count_key: str = "auto_maker_part_count",
+    reset_counter_key: str = "auto_maker_reset_counter",
+) -> str:
+    st.subheader("송폼")
+    song_form = st.text_input(
+        label="송폼",
+        placeholder="예: A1BCBB(4)A2BBC",
+        key="auto_maker_song_form",
+    )
+
+    st.divider()
+
+    part_count = st.session_state.get(part_count_key, 3)
+    reset_counter = st.session_state.get(reset_counter_key, 0)
+
+    for i in range(part_count):
+        header_col, _ = st.columns([1, 3])
+        with header_col:
+            st.text_input(
+                label="",
+                placeholder="part",
+                key=f"auto_maker_part_name_{i}_{reset_counter}",
+            )
+        st.text_area(
+            label=f"가사 {i + 1}",
+            height=120,
+            placeholder="가사를 넣어주세요",
+            key=f"auto_maker_part_lyrics_{i}_{reset_counter}",
+        )
+        st.divider()
+
+    if st.button("➕ 파트 추가", use_container_width=True, key="auto_maker_add_part"):
+        st.session_state[part_count_key] = part_count + 1
+
+    return song_form
+
+
+def render_autofill_result_panel(
+    autofill_result: dict | None,
+    sunday_preview_text: str,
+) -> bool:
+    if autofill_result is None:
+        return False
+
+    st.subheader("자동생성 결과")
+    regenerate_clicked = st.button(
+        "재 생성",
+        key="auto_maker_regenerate_btn",
+        use_container_width=True,
+    )
+
+    left_result_col, right_result_col = st.columns([1, 1])
+
+    with left_result_col:
+        st.json(autofill_result)
+
+    with right_result_col:
+        st.text_area(
+            label="",
+            value=sunday_preview_text,
+            height=1000,
+        )
+
+    return regenerate_clicked
