@@ -108,11 +108,22 @@ def indent_text(text: str, spaces: int = 8) -> str:
     )
 
 
-def ppt_save(list, path):
-    prs = Presentation()
+def _remove_all_slides(prs):
+    slide_id_list = prs.slides._sldIdLst
 
-    for song in list:
-        render_song(prs, song)
+    for slide_id in list(slide_id_list):
+        prs.part.drop_rel(slide_id.rId)
+        slide_id_list.remove(slide_id)
+
+
+def ppt_save(song_list, path, template=None):
+    prs = Presentation(template) if template else Presentation()
+
+    if template:
+        _remove_all_slides(prs)
+
+    for song in song_list:
+        render_song(prs, song, apply_default_background=not template)
 
     prs.save(path)
 
