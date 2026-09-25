@@ -4,16 +4,26 @@ name = "🏠 Home"
 icon = "🏠"
 
 [[pages]]
-path = "pages/1_search_lyrics.py"
+path = "pages/1_auto_maker.py"
+name = "📂 악보 자동 분석"
+icon = "📂"
+
+[[pages]]
+path = "pages/2_ppt_generator.py"
+name = "💻 PPT 생성기"
+icon = "💻"
+
+[[pages]]
+path = "pages/3_search_lyrics.py"
 name = "🎼 가사 검색"
 icon = "🎼"
 
 [[pages]]
-path = "pages/2_ppt_generator.py"
-name = "💻 수련회용 PPT 생성기"
-icon = "💻"
+path = "pages/4_video_preprocessing.py"
+name = "🎬 비디오 전처리"
+icon = "🎬"
 
 [[pages]]
-path = "pages/3_youtube_bpm_code.py"
+path = "pages/5_youtube_bpm_code.py"
 name = "📊 BPM, Key 찾기"
 icon = "📊"

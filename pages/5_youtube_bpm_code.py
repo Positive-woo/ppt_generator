@@ -15,7 +15,7 @@ st.set_page_config(
     page_icon="🙏🏻",
     layout="wide",
 )
-st.title("🎵 YouTube Audio 분석기 // 웹페이지에서는 사용불가 ㅜㅜ")
+st.title("🎵 YouTube Audio 분석기")
 
 
 import time
@@ -58,11 +58,16 @@ with right:
                 audio_buf = download_wav_to_tempfile(url)
                 t = log_time("download_wav_to_memory", t)
 
-                bpm = get_bpm_from_wav(audio_buf)
-                t = log_time("get_bpm_from_buffer", t)
+                try:
+                    bpm = get_bpm_from_wav(audio_buf)
+                    t = log_time("get_bpm_from_buffer", t)
 
-                result = get_key_from_wav(audio_buf)
-                t = log_time("get_key_from_buffer", t)
+                    result = get_key_from_wav(audio_buf)
+                    t = log_time("get_key_from_buffer", t)
+                finally:
+                    import os
+                    if audio_buf.exists():
+                        os.unlink(audio_buf)
 
             print(f"[TIME] totla : {time.time() - t:.3f}s")
             st.success("분석 완료")
